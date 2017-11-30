@@ -1,0 +1,40 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+	<style>
+		.example{
+			display: inline-flex;
+			width:100%;
+		}
+		.example .part{
+			padding: 20px;
+		}
+		.part canvas{
+			width:250px;
+			height: 250px;
+			border:0.5pt solid #555;
+		}
+		.part .code{
+			background-color: #eee;
+			width:300px;
+			white-space: pre;
+			overflow-x: auto;
+			padding: 20px;
+			font-family: monospace;
+			color:#444;
+		}
+	</style>
+</head>
+<body>
+<script type="text/template" id="example">
+	<div class="example">
+		<div class="part"><canvas id="1"></canvas></div>
+		<div class="part" template-id="2"><canvas id="1" width="250" height="250"></canvas></div>
+		<div class="part">
+			<div class="code" id="3">hoi</div>
+		</div>
+	</div>
+</script>
+<script data-main="test-canvas" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.min.js"></script>
+</body>
+</html>
