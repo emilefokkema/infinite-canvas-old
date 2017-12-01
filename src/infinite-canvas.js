@@ -44,24 +44,7 @@ function(wrapCanvas, sender, contextWrapper, contextTransform){
 					currentDrag.endZoom();
 				}
 			},
-			cWrapper = contextWrapper(context, currentContextTransform),
-			getSet = function(){
-				var firstArgument = arguments[0];
-				var map;
-				if(typeof firstArgument === "function"){
-					map = function(mapper, getViewBox){
-						return firstArgument(getViewBox()).map(mapper);
-					};
-				}else if(typeof firstArgument === "object"){
-
-				}else{
-					throw 'unrecognized argument to getSet'
-				}
-				
-				return {
-					map:map
-				};
-			};
+			cWrapper = contextWrapper(context, currentContextTransform);
 		c.onClick(function(x,y,shift){
 			var pos = currentContextTransform.screenPositionToPoint(x, y);
 			pos.shiftKey = shift;
@@ -113,7 +96,6 @@ function(wrapCanvas, sender, contextWrapper, contextTransform){
 			return d < 15;
 		};
 		return {
-			getSet:getSet,
 			onDragMove:function(f){
 				c.addEventListener('positiondragmove', function(e){
 					var pos = currentContextTransform.screenPositionToPoint(e.detail.toX, e.detail.toY);

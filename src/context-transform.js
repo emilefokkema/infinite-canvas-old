@@ -102,16 +102,6 @@ define(["transform"],function(transform){
 				setCache();
 				setTransform();
 			},
-			getViewBox = function(){
-				var p1 = screenPositionToPoint(0,0);
-				var p2 = screenPositionToPoint(w,h);
-				return {
-					x:p1.x,
-					y:p1.y,
-					width:p2.x - p1.x,
-					height:p2.y - p1.y
-				};
-			},
 			getTransformedViewBox = function(){
 				var transformInverse = currentTotalTransformInverse;
 				var leftTop = transformInverse.apply(0,0);
@@ -142,7 +132,6 @@ define(["transform"],function(transform){
 				resetTransform:resetTransform,
 				setCurrentTransform:setCurrentTransform,
 				addToCurrentTransform:addToCurrentTransform,
-				getViewBox:getViewBox,
 				getTransformedViewBox:function(){return currentTransformedViewBox;}
 			};
 
