@@ -2,8 +2,9 @@ define([
 	"wrap-canvas",
 	"sender",
 	"contextWrapper",
-	"context-transform"],
-function(wrapCanvas, sender, contextWrapper, contextTransform){
+	"context-transform",
+	"buffer"],
+function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 	var factory = function(c){
 		var w = c.w,
 			h = c.h,
@@ -85,10 +86,23 @@ function(wrapCanvas, sender, contextWrapper, contextTransform){
 			var pos = currentContextTransform.screenPositionToPoint(clientX, clientY);
 			return onContextMenu(clientX, clientY, pos.x, pos.y, preventDefault);
 		});
-		c.onWheel(function(x, y, delta){
-			currentContextTransform.zoom(Math.pow(2, -delta / 200), x, y);
-			c.drawAll();
-		});
+		c.onWheel(
+			buffer(function(x, y, delta){
+				var factor = Math.pow(2, -delta / 100);
+				return currentContextTransform.getCurrentScale() * factor;
+			}, function(current, goal){
+				return current < goal * 0.9 || current > goal * 1.1;
+			}, function(x, y, delta){
+				if(delta > 0){
+					currentContextTransform.zoom(0.9, x, y);
+					c.drawAll();
+				}
+				if(delta < 0){
+					currentContextTransform.zoom(1.1, x, y);
+					c.drawAll();
+				}
+				return currentContextTransform.getCurrentScale();
+			}));
 		var areClose = function(x1, y1, x2, y2){
 			var screenPoint1 = currentContextTransform.positionToMousePosition({x:x1,y:y1});
 			var screenPoint2 = currentContextTransform.positionToMousePosition({x:x2,y:y2});

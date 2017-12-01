@@ -8,6 +8,11 @@ define([],function(){
 		this.e = e;
 		this.f = f;
 	};
+	Object.defineProperty(transform.prototype, "size", {
+		get:function(){
+			return Math.sqrt(Math.abs(this.a) * Math.abs(this.d));
+		}
+	});
 	transform.prototype.before = function(other){
 		var a = this.a * other.a + this.b * other.c;
 		var b = this.a * other.b + this.b * other.d;

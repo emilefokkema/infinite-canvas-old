@@ -113,10 +113,14 @@ define(["transform","viewbox"],function(transform, viewBox){
 				var minY = Math.min(leftTop.y,leftBottom.y,rightBottom.y,rightTop.y);
 				var maxY = Math.max(leftTop.y,leftBottom.y,rightBottom.y,rightTop.y);
 				return new viewBox(minX, minY, maxX - minX, maxY - minY);
+			},
+			getCurrentScale = function(){
+				return currentTotalTransform.size;
 			};
 			setCache();
 			return {
 				zoom:zoom,
+				getCurrentScale:getCurrentScale,
 				makeDrag:makeDrag,
 				screenPositionToPoint:screenPositionToPoint,
 				positionToMousePosition:positionToMousePosition,
