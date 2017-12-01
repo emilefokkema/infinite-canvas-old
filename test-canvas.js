@@ -262,10 +262,12 @@ requirejs(["infinite-canvas","requireElement"], function(infiniteCanvas, require
 			preliminaryCode:function(){
 				var expand = {
 					initialIndex:function(viewBox){
+						viewBox = viewBox.expand(1);
 						var maxR = Math.max(Math.abs(viewBox.x), Math.abs(viewBox.x + viewBox.width), Math.abs(viewBox.y), Math.abs(viewBox.y + viewBox.height));
 						return Math.floor(maxR);
 					},
 					includeIndex:function(index, viewBox){
+						viewBox = viewBox.expand(1);
 						var maxR = Math.max(Math.abs(viewBox.x), Math.abs(viewBox.x + viewBox.width), Math.abs(viewBox.y), Math.abs(viewBox.y + viewBox.height));
 						var minR;
 						if(viewBox.x < 0 && viewBox.x + viewBox.width > 0 && viewBox.y < 0 && viewBox.y + viewBox.height > 0){

@@ -1,4 +1,4 @@
-define(["transform"],function(transform){
+define(["transform","viewbox"],function(transform, viewBox){
 	return function(context, w, h){
 		var coordinateTransform = new transform(1,0,0,1,0,0),
 			currentTransform = new transform(1,0,0,1,0,0),
@@ -112,12 +112,7 @@ define(["transform"],function(transform){
 				var maxX = Math.max(leftTop.x,leftBottom.x,rightBottom.x,rightTop.x);
 				var minY = Math.min(leftTop.y,leftBottom.y,rightBottom.y,rightTop.y);
 				var maxY = Math.max(leftTop.y,leftBottom.y,rightBottom.y,rightTop.y);
-				return {
-					x:minX,
-					y:minY,
-					width:maxX - minX,
-					height:maxY - minY
-				};
+				return new viewBox(minX, minY, maxX - minX, maxY - minY);
 			};
 			setCache();
 			return {
