@@ -116,6 +116,12 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 					f(pos.x, pos.y);
 				});
 			},
+			onMouseMove:function(f){
+				c.addEventListener('custommousemove', function(e){
+					var pos = currentContextTransform.screenPositionToPoint(e.detail.x, e.detail.y);
+					f(pos.x, pos.y);
+				});
+			},
 			zoom:currentContextTransform.zoom,
 			drawAll:function(){c.drawAll();},
 			onDraw:function(f){

@@ -156,12 +156,18 @@ define(["sender"],function(sender){
 			dragger = draggerFactory.make(screenPos.x, screenPos.y);
 		});
 		canvas.addEventListener('mousemove',function(e){
-			if(dragger && (e.movementX != 0 || e.movementY != 0) ){
+			if(e.movementX != 0 || e.movementY != 0){
 				var screenPos = getScreenPosition(e.clientX, e.clientY);
-				dragger.moveTo(screenPos.x, screenPos.y);
-				dragHappened = true;
+				if(dragger){
+					dragger.moveTo(screenPos.x, screenPos.y);
+					dragHappened = true;
+				}else{
+					var event = new CustomEvent('custommousemove', {'detail':{x:screenPos.x,y:screenPos.y}});
+					canvas.dispatchEvent(event);
+				}
 			}
 			return true;
+			
 		});
 		canvas.addEventListener('mouseup',function(){
 			if(dragger){
