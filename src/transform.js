@@ -10,7 +10,7 @@ define([],function(){
 	};
 	Object.defineProperty(transform.prototype, "size", {
 		get:function(){
-			return Math.sqrt(Math.abs(this.a) * Math.abs(this.d));
+			return Math.sqrt(Math.abs(this.a * this.d - this.b * this.c));
 		}
 	});
 	transform.prototype.before = function(other){

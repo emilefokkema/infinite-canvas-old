@@ -60,9 +60,8 @@ define(["transform","multiple-transformation"],function(transform, multipleTrans
 
 		propertiesObj["getRelativeSize"] = {
 			value:function(absoluteSize){
-				var p0 = currentContextTransform.screenPositionToPoint(0,0);
-				var p1 = currentContextTransform.screenPositionToPoint(absoluteSize, 0);
-				return Math.abs(p1.x - p0.x);
+				var currentScale = currentContextTransform.getCurrentScale();
+				return absoluteSize / currentScale;
 			}
 		};
 		
