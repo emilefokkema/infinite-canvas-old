@@ -103,13 +103,7 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 				}
 				return currentContextTransform.getCurrentScale();
 			}));
-		var areClose = function(x1, y1, x2, y2){
-			var screenPoint1 = currentContextTransform.positionToMousePosition({x:x1,y:y1});
-			var screenPoint2 = currentContextTransform.positionToMousePosition({x:x2,y:y2});
-			var d = Math.sqrt(Math.pow(screenPoint1.x - screenPoint2.x,2) + Math.pow(screenPoint1.y - screenPoint2.y,2));
-			return d < 15;
-		};
-		return {
+		var infCan = {
 			onDragMove:function(f){
 				c.addEventListener('positiondragmove', function(e){
 					var pos = currentContextTransform.screenPositionToPoint(e.detail.toX, e.detail.toY);
@@ -132,9 +126,14 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 			onContextMenu:function(f){onContextMenu.add(f);},
 			onDragStart:function(f){onDragStart.add(f);},
 			onDragEnd:function(f){onDragEnd.add(f);},
-			areClose:areClose,
 			toDataURL:function(){return c.toDataURL.apply(null,arguments);}
 		};
+		Object.defineProperty(infCan, "scale", {
+			get:function(){
+				return currentContextTransform.getCurrentScale();
+			}
+		});
+		return infCan;
 	};
 	return function(canvas){
 		return factory(wrapCanvas(canvas));
