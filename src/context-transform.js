@@ -115,12 +115,23 @@ define(["transform","viewbox"],function(transform, viewBox){
 				return new viewBox(minX, minY, maxX - minX, maxY - minY);
 			},
 			getCurrentScale = function(){
-				return currentTotalTransform.size;
+				return coordinateTransform.size;
+			},
+			getCurrentTransform = function(){
+				return {
+					a: coordinateTransform.a,
+					b: coordinateTransform.b,
+					c: coordinateTransform.c,
+					d: coordinateTransform.d,
+					e: coordinateTransform.e,
+					f: coordinateTransform.f
+				};
 			};
 			setCache();
 			return {
 				zoom:zoom,
 				getCurrentScale:getCurrentScale,
+				getCurrentTransform:getCurrentTransform,
 				makeDrag:makeDrag,
 				screenPositionToPoint:screenPositionToPoint,
 				positionToMousePosition:positionToMousePosition,

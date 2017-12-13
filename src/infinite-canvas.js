@@ -133,6 +133,11 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 				return currentContextTransform.getCurrentScale();
 			}
 		});
+		Object.defineProperty(infCan, "transform", {
+			get:function(){
+				return currentContextTransform.getCurrentTransform();
+			}
+		});
 		return infCan;
 	};
 	return function(canvas){
