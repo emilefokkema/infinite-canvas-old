@@ -5,6 +5,10 @@ define([
 	"context-transform",
 	"buffer"],
 function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
+	var mode = {
+		SYNC:1,
+		ASYNC:2
+	};
 	var factory = function(c){
 		var w = c.w,
 			h = c.h,
@@ -15,7 +19,7 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 			onDragEnd = sender(),
 			onContextMenu = sender(function(a,b){return a && b}, true),
 			onDragStart = sender(function(a,b){return a && b}, true),
-			
+			currentMode,
 			
 			currentDrag = null,
 			
@@ -119,8 +123,22 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 			zoom:currentContextTransform.zoom,
 			drawAll:function(){c.drawAll();},
 			onDraw:function(f){
-				onDraw.add(f);
+				if(currentMode === mode.ASYNC){
+					throw "onDraw not available in async mode";
+				}
+				currentMode = mode.SYNC;
+				if(!f){
+					onDraw = sender();
+				}else{
+					onDraw.add(f);
+				}
 				c.drawAll();
+			},
+			onDrawAsync:function(f){
+				if(currentMode === mode.SYNC){
+					throw "onDrawAnync not available in sync mode";
+				}
+				currentMode = mode.ASYNC;
 			},
 			onClick:function(f){onClick.add(f);},
 			onContextMenu:function(f){onContextMenu.add(f);},
