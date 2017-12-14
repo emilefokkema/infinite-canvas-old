@@ -326,5 +326,11 @@ requirejs(["infinite-canvas","requireElement"], function(infiniteCanvas, require
 			c.onDraw(function(ctx){e.code.apply(null,[ctx].concat(preliminaryCodeResult))});
 			
 		});
-	})
+	});
+
+	var asyncCanvas = infiniteCanvas(document.getElementById("asyncCanvas"));
+	asyncCanvas.onDrawAsync(function(ctx, viewBox){
+		ctx.fillStyle = 'hsl('+viewBox.x+',50%,50%)';
+		ctx.fillRect(viewBox.x, viewBox.y, viewBox.width, viewBox.height);
+	});
 })

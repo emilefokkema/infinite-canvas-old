@@ -136,7 +136,7 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 			},
 			onDrawAsync:function(f){
 				if(currentMode === mode.SYNC){
-					throw "onDrawAnync not available in sync mode";
+					throw "onDrawAsync not available in sync mode";
 				}
 				currentMode = mode.ASYNC;
 			},
