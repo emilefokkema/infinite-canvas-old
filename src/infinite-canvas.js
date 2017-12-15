@@ -3,8 +3,9 @@ define([
 	"sender",
 	"contextWrapper",
 	"context-transform",
-	"buffer"],
-function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
+	"buffer",
+	"make-async-drawing-loop"],
+function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsyncDrawingLoop){
 	var mode = {
 		SYNC:1,
 		ASYNC:2
@@ -52,7 +53,15 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 			cWrapper = contextWrapper(context, currentContextTransform),
 			asyncDrawing,
 			beginAsyncDrawing = function(f){
-				
+				var proxyOnDraw = function(ff){
+					if(!ff){
+						onDraw = sender();
+					}else{
+						onDraw.add(ff);
+					}
+					c.drawAll();
+				};
+				var loop = makeAsyncDrawingLoop(f, proxyOnDraw);
 				return 1;
 			};
 		c.onClick(function(x,y,shift){
