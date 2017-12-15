@@ -49,7 +49,12 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 					currentDrag.endZoom();
 				}
 			},
-			cWrapper = contextWrapper(context, currentContextTransform);
+			cWrapper = contextWrapper(context, currentContextTransform),
+			asyncDrawing,
+			beginAsyncDrawing = function(f){
+				
+				return 1;
+			};
 		c.onClick(function(x,y,shift){
 			var pos = currentContextTransform.screenPositionToPoint(x, y);
 			pos.shiftKey = shift;
@@ -139,6 +144,9 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 					throw "onDrawAsync not available in sync mode";
 				}
 				currentMode = mode.ASYNC;
+				if(!asyncDrawing){
+					asyncDrawing = beginAsyncDrawing(f);
+				}
 			},
 			onClick:function(f){onClick.add(f);},
 			onContextMenu:function(f){onContextMenu.add(f);},
