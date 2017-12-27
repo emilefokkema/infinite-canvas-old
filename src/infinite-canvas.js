@@ -25,6 +25,9 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			currentDrag = null,
 			
 			beginDrag = function(x,y){
+				if(asyncDrawing){
+					asyncDrawing.stop();
+				}
 				currentDrag = currentContextTransform.makeDrag(x, y);
 			},
 			moveDrag = function(x, y){
@@ -34,6 +37,9 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			},
 			endDrag = function(){
 				currentDrag = null;
+				if(asyncDrawing){
+					asyncDrawing.start();
+				}
 			},
 			startZoom = function(r){
 				if(currentDrag){
@@ -61,8 +67,9 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 					}
 					c.drawAll();
 				};
-				var loop = makeAsyncDrawingLoop(f, proxyOnDraw);
-				return 1;
+				var loop = makeAsyncDrawingLoop(f, proxyOnDraw, currentContextTransform, c, cWrapper);
+				loop.start();
+				return loop;
 			};
 		c.onClick(function(x,y,shift){
 			var pos = currentContextTransform.screenPositionToPoint(x, y);

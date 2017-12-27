@@ -196,6 +196,7 @@ define(["sender"],function(sender){
 			onDraw:function(f){
 				onDraw.add(f);
 			},
+			clear:function(){canvas.width = w;},
 			drawAll:drawAll,
 			onClick:function(f){onClick.add(f);},
 			onContextMenu:function(f){onContextMenu.add(f);},
