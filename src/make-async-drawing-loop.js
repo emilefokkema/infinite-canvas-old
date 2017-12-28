@@ -55,7 +55,8 @@ define(["viewbox"],function(viewBox){
 	};
 
 	return function(f, onDraw, currentContextTransform, c, cWrapper){ //f: function(ctx, viewBox, done)
-		var going, start, stop, dividedBox, drawNext, nextBox, currentId = 0, callbackManager = callbackManagerFactory();
+		var going, start, stop, dividedBox, drawNext, nextBox, currentId = 0, callbackManager = callbackManagerFactory(),
+			startingTimeout;
 		start = function(){
 			console.log("start");
 			var latestViewBox = currentContextTransform.getTransformedViewBox();
@@ -65,7 +66,6 @@ define(["viewbox"],function(viewBox){
 			going = true;
 			drawNext = function(){
 				if(going){
-					console.log("calling next");
 					nextBox = dividedBox.next();
 					if(!nextBox.done){
 						currentContextTransform.removeTransform();
@@ -82,11 +82,25 @@ define(["viewbox"],function(viewBox){
 			drawNext();
 		};
 		stop = function(){
-			console.log("stop");
 			going = false;
 			callbackManager.cancelOpen();
 			
 		};
-		return {start:start,stop:stop};
+		return {
+			start:function(){
+				if(!going){
+					start();
+				}
+			},
+			pauze:function(){
+				if(going){
+					stop();
+				}
+				if(startingTimeout){
+					clearTimeout(startingTimeout);
+				}
+				startingTimeout = setTimeout(start, 1000);
+			}
+		};
 	};
 })

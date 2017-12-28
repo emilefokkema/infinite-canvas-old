@@ -73,6 +73,9 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			onClick(pos);
 		});
 		c.addEventListener('positiondragmove',function(e){
+			if(asyncDrawing){
+				asyncDrawing.pauze();
+			}
 			moveDrag(e.detail.toX, e.detail.toY);
 			c.drawAll();
 		});
@@ -80,16 +83,10 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			endDrag();
 			onDragEnd();
 			c.drawAll();
-			if(asyncDrawing){
-				asyncDrawing.start();
-			}
 		});
 		c.addEventListener('positiondragstart',function(e){
 			var pos = currentContextTransform.screenPositionToPoint(e.detail.x, e.detail.y);
 			if(onDragStart(pos.x, pos.y)){
-				if(asyncDrawing){
-					asyncDrawing.stop();
-				}
 				beginDrag(e.detail.x, e.detail.y);
 			}
 		});
@@ -97,6 +94,9 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			startZoom(e.detail.r);
 		});
 		c.addEventListener('changezoom',function(e){
+			if(asyncDrawing){
+				asyncDrawing.pauze();
+			}
 			changeZoom(e.detail.r);
 			c.drawAll();
 		});
@@ -120,6 +120,9 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			}, function(current, goal){
 				return current < goal * 0.9 || current > goal * 1.1;
 			}, function(x, y, delta){
+				if(asyncDrawing){
+					asyncDrawing.pauze();
+				}
 				if(delta > 0){
 					currentContextTransform.zoom(0.9, x, y);
 					c.drawAll();
