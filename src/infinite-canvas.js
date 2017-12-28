@@ -54,7 +54,7 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			},
 			cWrapper = contextWrapper(context, currentContextTransform),
 			asyncDrawing,
-			beginAsyncDrawing = function(f, size){
+			beginAsyncDrawing = function(f, size, chunkSize){
 				var proxyOnDraw = function(ff){
 					if(!ff){
 						onDraw = sender();
@@ -63,7 +63,7 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 					}
 					c.drawAll();
 				};
-				var loop = makeAsyncDrawingLoop(f, proxyOnDraw, currentContextTransform, c, cWrapper, size);
+				var loop = makeAsyncDrawingLoop(f, proxyOnDraw, currentContextTransform, c, cWrapper, size, chunkSize);
 				loop.start();
 				return loop;
 			};
@@ -163,12 +163,13 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			drawAsync:function(obj){
 				var f = obj.f;
 				var size = obj.boxSize || 5;
+				var chunkSize = obj.chunkSize || 1;
 				if(currentMode === mode.SYNC){
 					throw "onDrawAsync not available in sync mode";
 				}
 				currentMode = mode.ASYNC;
 				if(!asyncDrawing){
-					asyncDrawing = beginAsyncDrawing(f, size);
+					asyncDrawing = beginAsyncDrawing(f, size, chunkSize);
 				}
 			},
 			onClick:function(f){onClick.add(f);},

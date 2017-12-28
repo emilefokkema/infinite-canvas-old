@@ -53,13 +53,11 @@ define(["viewbox"],function(viewBox){
 		};
 	};
 
-	return function(f, onDraw, currentContextTransform, c, cWrapper, size){ //f: function(ctx, viewBox, done)
-		var going, start, stop, dividedBox, drawNext, nextBox, currentId = 0, callbackManager = callbackManagerFactory(),
-			startingTimeout;
+	return function(f, onDraw, currentContextTransform, c, cWrapper, size, chunkSize){ //f: function(ctx, viewBox, done)
+		var going, start, stop, dividedBox, drawNext, nextBox, callbackManager = callbackManagerFactory(),
+			startingTimeout, chunkCounter = 0;
 		start = function(){
-			console.log("start");
 			var latestViewBox = currentContextTransform.getTransformedViewBox();
-			console.log(latestViewBox);
 			dividedBox = divideViewBox(latestViewBox, size / currentContextTransform.getCurrentScale());
 			
 			going = true;
@@ -70,7 +68,13 @@ define(["viewbox"],function(viewBox){
 						currentContextTransform.removeTransform();
 						currentContextTransform.setTransform();
 						f(cWrapper, nextBox.value, callbackManager.make(function(){
-							setTimeout(drawNext, 1);
+							chunkCounter++;
+							if(chunkCounter < chunkSize){
+								drawNext();
+							}else{
+								chunkCounter = 0;
+								setTimeout(drawNext, 1);
+							}
 						}));
 						currentContextTransform.resetTransform();
 					}else{
@@ -92,13 +96,21 @@ define(["viewbox"],function(viewBox){
 				}
 			},
 			pauze:function(){
+				var hasResumed = false;
 				if(going){
 					stop();
 				}
 				if(startingTimeout){
 					clearTimeout(startingTimeout);
 				}
-				startingTimeout = setTimeout(start, 1000);
+				var resume = function(){
+					if(!hasResumed){
+						hasResumed = true;
+						start();
+					}
+				};
+				startingTimeout = setTimeout(resume, 1000);
+				return resume;
 			}
 		};
 	};
