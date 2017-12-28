@@ -82,7 +82,11 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 		c.addEventListener('positiondragend',function(){
 			endDrag();
 			onDragEnd();
-			c.drawAll();
+			if(asyncDrawing){
+				asyncDrawing.start();
+			}else{
+				c.drawAll();
+			}
 		});
 		c.addEventListener('positiondragstart',function(e){
 			var pos = currentContextTransform.screenPositionToPoint(e.detail.x, e.detail.y);
@@ -102,6 +106,9 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 		});
 		c.addEventListener('endzoom',function(e){
 			endZoom();
+			if(asyncDrawing){
+				asyncDrawing.start();
+			}
 		});
 		c.onDraw(function(){
 			currentContextTransform.removeTransform();
@@ -132,6 +139,10 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 					c.drawAll();
 				}
 				return currentContextTransform.getCurrentScale();
+			}, function(){
+				if(asyncDrawing){
+					asyncDrawing.start();
+				}
 			}));
 		var infCan = {
 			onDragMove:function(f){

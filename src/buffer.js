@@ -1,5 +1,5 @@
 define([],function(){
-	var buffer = function(setGoal, shouldMove, doStep){
+	var buffer = function(setGoal, shouldMove, doStep, onDone){
 		var goal, current, latestArgs, going = false;
 		var toRepeat = function(){
 			current = doStep.apply(null, latestArgs);
@@ -8,6 +8,7 @@ define([],function(){
 				setTimeout(toRepeat, 10);
 			}else{
 				going = false;
+				onDone && onDone();
 			}
 		};
 		return function(){

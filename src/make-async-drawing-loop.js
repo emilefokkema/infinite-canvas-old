@@ -57,9 +57,9 @@ define(["viewbox"],function(viewBox){
 		var going, start, stop, dividedBox, drawNext, nextBox, callbackManager = callbackManagerFactory(),
 			startingTimeout, chunkCounter = 0;
 		start = function(){
+			if(going){return;}
 			var latestViewBox = currentContextTransform.getTransformedViewBox();
 			dividedBox = divideViewBox(latestViewBox, size / currentContextTransform.getCurrentScale());
-			
 			going = true;
 			drawNext = function(){
 				if(going){
@@ -90,27 +90,15 @@ define(["viewbox"],function(viewBox){
 			
 		};
 		return {
-			start:function(){
-				if(!going){
-					start();
-				}
-			},
+			start:start,
 			pauze:function(){
-				var hasResumed = false;
 				if(going){
 					stop();
 				}
 				if(startingTimeout){
 					clearTimeout(startingTimeout);
 				}
-				var resume = function(){
-					if(!hasResumed){
-						hasResumed = true;
-						start();
-					}
-				};
-				startingTimeout = setTimeout(resume, 1000);
-				return resume;
+				startingTimeout = setTimeout(start, 1000);
 			}
 		};
 	};
