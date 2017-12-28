@@ -329,10 +329,13 @@ requirejs(["infinite-canvas","requireElement"], function(infiniteCanvas, require
 	});
 
 	var asyncCanvas = infiniteCanvas(document.getElementById("asyncCanvas"));
-	asyncCanvas.onDrawAsync(function(ctx, viewBox, done){
-		ctx.fillStyle = 'hsl('+viewBox.x+',50%,50%)';
-		ctx.fillRect(viewBox.x, viewBox.y, viewBox.width, viewBox.height);
-		//setTimeout(done, 5);
-		done();
+	asyncCanvas.drawAsync({
+		f:function(ctx, viewBox, done){
+			ctx.fillStyle = 'hsl('+100*(Math.sin(viewBox.x) + Math.sin(viewBox.y))+',50%,50%)';
+			ctx.fillRect(viewBox.x, viewBox.y, viewBox.width, viewBox.height);
+			//setTimeout(done, 5);
+			done();
+		},
+		boxSize:3
 	});
 })

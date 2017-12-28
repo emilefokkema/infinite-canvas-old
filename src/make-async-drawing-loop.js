@@ -1,6 +1,5 @@
 define(["viewbox"],function(viewBox){
-	var divideViewBox = function(b){
-		var size = Math.min(b.width, b.height) / 20;
+	var divideViewBox = function(b, size){
 		var i = 0,
 			j = 0,
 			w = Math.floor(b.width / size) + 1,
@@ -54,14 +53,14 @@ define(["viewbox"],function(viewBox){
 		};
 	};
 
-	return function(f, onDraw, currentContextTransform, c, cWrapper){ //f: function(ctx, viewBox, done)
+	return function(f, onDraw, currentContextTransform, c, cWrapper, size){ //f: function(ctx, viewBox, done)
 		var going, start, stop, dividedBox, drawNext, nextBox, currentId = 0, callbackManager = callbackManagerFactory(),
 			startingTimeout;
 		start = function(){
 			console.log("start");
 			var latestViewBox = currentContextTransform.getTransformedViewBox();
 			console.log(latestViewBox);
-			dividedBox = divideViewBox(latestViewBox);
+			dividedBox = divideViewBox(latestViewBox, size / currentContextTransform.getCurrentScale());
 			
 			going = true;
 			drawNext = function(){
