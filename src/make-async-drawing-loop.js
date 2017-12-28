@@ -54,7 +54,7 @@ define(["viewbox"],function(viewBox){
 	};
 
 	return function(f, onDraw, currentContextTransform, c, cWrapper, size, chunkSize){ //f: function(ctx, viewBox, done)
-		var going, start, stop, dividedBox, drawNext, nextBox, callbackManager = callbackManagerFactory(),
+		var going, isComplete = false, start, stop, dividedBox, drawNext, nextBox, callbackManager = callbackManagerFactory(),
 			startingTimeout, chunkCounter = 0;
 		start = function(){
 			if(going){return;}
@@ -78,7 +78,8 @@ define(["viewbox"],function(viewBox){
 						}));
 						currentContextTransform.resetTransform();
 					}else{
-						stop();
+						going = false;
+						isComplete = true;
 					}
 				}
 			};
@@ -86,13 +87,24 @@ define(["viewbox"],function(viewBox){
 		};
 		stop = function(){
 			going = false;
+			isComplete = false;
 			callbackManager.cancelOpen();
-			
+			var latestInverse = currentContextTransform.getCurrentInverseTransform();
+			var url = c.toDataURL();
+			var img = new Image();
+			img.src = url;
+			onDraw();
+			onDraw(function(ctx){
+				ctx.save();
+				ctx.transform(latestInverse.a, latestInverse.b, latestInverse.c, latestInverse.d, latestInverse.e, latestInverse.f);
+				ctx.drawImage(img, 0,0);
+				ctx.restore();
+			});
 		};
 		return {
 			start:start,
 			pauze:function(){
-				if(going){
+				if(going || isComplete){
 					stop();
 				}
 				if(startingTimeout){

@@ -126,12 +126,23 @@ define(["transform","viewbox"],function(transform, viewBox){
 					e: coordinateTransform.e,
 					f: coordinateTransform.f
 				};
+			},
+			getCurrentInverseTransform = function(){
+				return {
+					a: coordinateTransformInverse.a,
+					b: coordinateTransformInverse.b,
+					c: coordinateTransformInverse.c,
+					d: coordinateTransformInverse.d,
+					e: coordinateTransformInverse.e,
+					f: coordinateTransformInverse.f
+				};
 			};
 			setCache();
 			return {
 				zoom:zoom,
 				getCurrentScale:getCurrentScale,
 				getCurrentTransform:getCurrentTransform,
+				getCurrentInverseTransform:getCurrentInverseTransform,
 				makeDrag:makeDrag,
 				screenPositionToPoint:screenPositionToPoint,
 				positionToMousePosition:positionToMousePosition,
