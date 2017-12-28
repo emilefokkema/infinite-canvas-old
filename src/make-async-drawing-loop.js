@@ -2,7 +2,7 @@ define(["viewbox"],function(viewBox){
 	var divideViewBox = function(b){
 		var size = Math.min(b.width, b.height) / 20;
 		var i = 0,
-			j = -1,
+			j = 0,
 			w = Math.floor(b.width / size) + 1,
 			h = Math.floor(b.height / size) + 1,
 			done = {done:true};

@@ -25,9 +25,7 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			currentDrag = null,
 			
 			beginDrag = function(x,y){
-				if(asyncDrawing){
-					asyncDrawing.stop();
-				}
+				
 				currentDrag = currentContextTransform.makeDrag(x, y);
 			},
 			moveDrag = function(x, y){
@@ -37,9 +35,7 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			},
 			endDrag = function(){
 				currentDrag = null;
-				if(asyncDrawing){
-					asyncDrawing.start();
-				}
+				
 			},
 			startZoom = function(r){
 				if(currentDrag){
@@ -84,10 +80,16 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsync
 			endDrag();
 			onDragEnd();
 			c.drawAll();
+			if(asyncDrawing){
+				asyncDrawing.start();
+			}
 		});
 		c.addEventListener('positiondragstart',function(e){
 			var pos = currentContextTransform.screenPositionToPoint(e.detail.x, e.detail.y);
 			if(onDragStart(pos.x, pos.y)){
+				if(asyncDrawing){
+					asyncDrawing.stop();
+				}
 				beginDrag(e.detail.x, e.detail.y);
 			}
 		});

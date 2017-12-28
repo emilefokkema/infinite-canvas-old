@@ -332,6 +332,7 @@ requirejs(["infinite-canvas","requireElement"], function(infiniteCanvas, require
 	asyncCanvas.onDrawAsync(function(ctx, viewBox, done){
 		ctx.fillStyle = 'hsl('+viewBox.x+',50%,50%)';
 		ctx.fillRect(viewBox.x, viewBox.y, viewBox.width, viewBox.height);
-		setTimeout(done, 5);
+		//setTimeout(done, 5);
+		done();
 	});
 })
