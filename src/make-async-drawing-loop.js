@@ -58,6 +58,8 @@ define(["viewbox"],function(viewBox){
 			startingTimeout, chunkCounter = 0;
 		start = function(){
 			if(going){return;}
+			console.log("starting drawing loop");
+			console.log(currentContextTransform.getCurrentScale());
 			var latestViewBox = currentContextTransform.getTransformedViewBox();
 			dividedBox = divideViewBox(latestViewBox, size / currentContextTransform.getCurrentScale());
 			going = true;
