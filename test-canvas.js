@@ -304,7 +304,7 @@ requirejs(["infinite-canvas","requireElement"], function(infiniteCanvas, require
 		}
 		return lines.join("\n");
 	};
-	
+
 	examples.map(function(e){
 		requireElement(document.getElementById("example"), function(canvas1, makeCanvas2, code){
 			var preliminaryCodeResult = [];
