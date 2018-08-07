@@ -326,5 +326,53 @@ requirejs(["infinite-canvas","requireElement"], function(infiniteCanvas, require
 			c.onDraw(function(ctx){e.code.apply(null,[ctx].concat(preliminaryCodeResult))});
 			
 		});
-	})
+	});
+
+	var asyncCanvas = infiniteCanvas(document.getElementById("asyncCanvas"));
+	asyncCanvas.drawAsync({
+		f:function(ctx, viewBox, done){
+			ctx.fillStyle = 'hsl('+100*(Math.sin(viewBox.x) + Math.sin(viewBox.y))+',50%,50%)';
+			ctx.fillRect(viewBox.x, viewBox.y, viewBox.width, viewBox.height);
+			done();
+		},
+		boxSize:3,
+		chunkSize:30
+	});
+	var escapeStep = function(maxIt, x, y){
+		var zrn, zin, zr = 0, zi = 0, cr = x, ci = y, step = 0, modsq = 0;
+		while(modsq < 4 && step++ < maxIt){
+			zrn = zr * zr - zi * zi + cr;
+			zin = 2 * zr * zi + ci;
+			zr = zrn;
+			zi = zin;
+			modsq = zr * zr + zi * zi;
+		}
+
+		return {modsq:modsq, step:step};
+	};
+	var colorScheme = {
+		lightness: function(normalizedStep){
+			return 50 * (1 + Math.sin(normalizedStep / 20));
+		},
+		hue: function(normalizedStep){
+			return normalizedStep*2;
+		}
+	};
+	var asyncCanvas2 = infiniteCanvas(document.getElementById("asyncCanvas2"));
+	asyncCanvas2.drawAsync({
+		f:function(ctx, viewBox, done){
+			var esc = escapeStep(4000,viewBox.x / 100, viewBox.y / 100);
+			if(esc.modsq < 4){
+				ctx.fillStyle = '#000';
+				ctx.fillRect(viewBox.x, viewBox.y, viewBox.width, viewBox.height);
+			}else{
+				var normalizedStep = esc.step + 1 - Math.log(Math.log(Math.sqrt(esc.modsq))) * 1.4426950408889634;
+				ctx.fillStyle = 'hsl('+colorScheme.hue(normalizedStep)+',50%,'+colorScheme.lightness(normalizedStep)+'%)';
+				ctx.fillRect(viewBox.x, viewBox.y, viewBox.width, viewBox.height);
+			}
+			done();
+		},
+		boxSize:3,
+		chunkSize:30
+	});
 })

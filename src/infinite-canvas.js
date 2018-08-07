@@ -3,8 +3,13 @@ define([
 	"sender",
 	"contextWrapper",
 	"context-transform",
-	"buffer"],
-function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
+	"buffer",
+	"make-async-drawing-loop"],
+function(wrapCanvas, sender, contextWrapper, contextTransform, buffer, makeAsyncDrawingLoop){
+	var mode = {
+		SYNC:1,
+		ASYNC:2
+	};
 	var factory = function(c){
 		var w = c.w,
 			h = c.h,
@@ -15,11 +20,12 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 			onDragEnd = sender(),
 			onContextMenu = sender(function(a,b){return a && b}, true),
 			onDragStart = sender(function(a,b){return a && b}, true),
-			
+			currentMode,
 			
 			currentDrag = null,
 			
 			beginDrag = function(x,y){
+				
 				currentDrag = currentContextTransform.makeDrag(x, y);
 			},
 			moveDrag = function(x, y){
@@ -29,6 +35,7 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 			},
 			endDrag = function(){
 				currentDrag = null;
+				
 			},
 			startZoom = function(r){
 				if(currentDrag){
@@ -45,20 +52,41 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 					currentDrag.endZoom();
 				}
 			},
-			cWrapper = contextWrapper(context, currentContextTransform);
+			cWrapper = contextWrapper(context, currentContextTransform),
+			asyncDrawing,
+			beginAsyncDrawing = function(f, size, chunkSize){
+				var proxyOnDraw = function(ff){
+					if(!ff){
+						onDraw = sender();
+					}else{
+						onDraw.add(ff);
+					}
+					c.drawAll();
+				};
+				var loop = makeAsyncDrawingLoop(f, proxyOnDraw, currentContextTransform, c, cWrapper, size, chunkSize);
+				loop.start();
+				return loop;
+			};
 		c.onClick(function(x,y,shift){
 			var pos = currentContextTransform.screenPositionToPoint(x, y);
 			pos.shiftKey = shift;
 			onClick(pos);
 		});
 		c.addEventListener('positiondragmove',function(e){
+			if(asyncDrawing){
+				asyncDrawing.pauze();
+			}
 			moveDrag(e.detail.toX, e.detail.toY);
 			c.drawAll();
 		});
 		c.addEventListener('positiondragend',function(){
 			endDrag();
 			onDragEnd();
-			c.drawAll();
+			if(asyncDrawing){
+				asyncDrawing.start();
+			}else{
+				c.drawAll();
+			}
 		});
 		c.addEventListener('positiondragstart',function(e){
 			var pos = currentContextTransform.screenPositionToPoint(e.detail.x, e.detail.y);
@@ -70,11 +98,17 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 			startZoom(e.detail.r);
 		});
 		c.addEventListener('changezoom',function(e){
+			if(asyncDrawing){
+				asyncDrawing.pauze();
+			}
 			changeZoom(e.detail.r);
 			c.drawAll();
 		});
 		c.addEventListener('endzoom',function(e){
 			endZoom();
+			if(asyncDrawing){
+				asyncDrawing.start();
+			}
 		});
 		c.onDraw(function(){
 			currentContextTransform.removeTransform();
@@ -93,6 +127,9 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 			}, function(current, goal){
 				return current < goal * 0.9 || current > goal * 1.1;
 			}, function(x, y, delta){
+				if(asyncDrawing){
+					asyncDrawing.pauze();
+				}
 				if(delta > 0){
 					currentContextTransform.zoom(0.9, x, y);
 					c.drawAll();
@@ -102,6 +139,10 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 					c.drawAll();
 				}
 				return currentContextTransform.getCurrentScale();
+			}, function(){
+				if(asyncDrawing){
+					asyncDrawing.start();
+				}
 			}));
 		var infCan = {
 			onDragMove:function(f){
@@ -119,8 +160,28 @@ function(wrapCanvas, sender, contextWrapper, contextTransform, buffer){
 			zoom:currentContextTransform.zoom,
 			drawAll:function(){c.drawAll();},
 			onDraw:function(f){
-				onDraw.add(f);
+				if(currentMode === mode.ASYNC){
+					throw "onDraw not available in async mode";
+				}
+				currentMode = mode.SYNC;
+				if(!f){
+					onDraw = sender();
+				}else{
+					onDraw.add(f);
+				}
 				c.drawAll();
+			},
+			drawAsync:function(obj){
+				var f = obj.f;
+				var size = obj.boxSize || 5;
+				var chunkSize = obj.chunkSize || 1;
+				if(currentMode === mode.SYNC){
+					throw "onDrawAsync not available in sync mode";
+				}
+				currentMode = mode.ASYNC;
+				if(!asyncDrawing){
+					asyncDrawing = beginAsyncDrawing(f, size, chunkSize);
+				}
 			},
 			onClick:function(f){onClick.add(f);},
 			onContextMenu:function(f){onContextMenu.add(f);},
